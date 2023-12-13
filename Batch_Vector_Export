@@ -1,0 +1,21 @@
+import arcpy
+import os
+
+def sanitize_filename(name):
+    invalid_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*', '&']
+    for char in invalid_chars:
+        name = name.replace(char, '_')
+    return name
+
+aprx = arcpy.mp.ArcGISProject("CURRENT")
+#figFolder = r"N (your file path)"
+figFolder = r"N:\A\An\GIS\pdf\Reporting\DP_Updates_v1"
+
+if not os.path.exists(figFolder):
+    os.makedirs(figFolder)
+
+#Adjust resolution and page dimensions
+for lyt in aprx.listLayouts():
+    print("{0} ({1} x {2} {3})".format(lyt.name, lyt.pageHeight, lyt.pageWidth, lyt.pageUnits))
+    safe_name = sanitize_filename(lyt.name)
+    lyt.exportToPDF(os.path.join(figFolder, safe_name + ".pdf"), resolution=300)
